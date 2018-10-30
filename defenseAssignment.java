@@ -45,10 +45,8 @@ public class defenseAssignment
 		return password;
 	}
 	
-
 	private static String getVal2(Scanner kb) 
-	{
-		
+	{		
 		System.out.println("Enter another Integer: ");
 		
 		String val2 = null;
@@ -92,34 +90,29 @@ public class defenseAssignment
 
 	private static String getLastName(Scanner kb) 
 	{
-		System.out.println("Enter Last Name: ");
-		
 		String lastName = "";
-		lastName = kb.nextLine();
-		while(!DataValidation.validateName(lastName))// we don't want it to be empty, and we do want it to pass our regex
-		{
-			System.out.println("Please enter a Last Name: ");
-			lastName = kb.nextLine();
-		}		
-		kb.nextLine();
-		return lastName;
+		String last = "Last";
+		return getName(kb,last);
 	}
 
 	private static String getFirstName(Scanner kb) 
 	{
-		System.out.println("Enter First Name: ");
-		
 		String firstName = "";
-		firstName = kb.nextLine();
-		while(!DataValidation.validateName(firstName))// we don't want it to be empty, and we do want it to pass our regex
-		{
-			System.out.println("Please enter a First Name: ");
-			firstName = kb.nextLine();
-		}		
-		kb.nextLine();
-		return firstName;
+		String first = "First";
+		return getName(kb,first);
 	}
 	
-	
-
+	private static String getName(Scanner kb, String whichName)
+	{
+		System.out.println("Enter " + whichName + " Name: ");		
+		String returnName = "";
+		returnName = kb.nextLine();
+		while(!DataValidation.validateName(returnName))// we don't want it to be empty, and we do want it to pass our regex
+		{
+			System.out.println("Please enter a " + whichName+" Name: ");
+			returnName = kb.nextLine();
+		}		
+		kb.nextLine();
+		return returnName;
+	}
 }
