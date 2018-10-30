@@ -11,15 +11,17 @@ public class defenseAssignment
 
 		String firstName = getFirstName(kb);
 		String lastName = getLastName(kb);
-		String val1 = getVal1(kb);
-		String val2 = getVal2(kb);
-		//File fileIn = getInputFile(kb);
-		//File fileOut = getOutputFile(kb);
+		BigInteger val1 = new BigInteger(getVal1(kb));
+		BigInteger val2 = new BigInteger(getVal2(kb));
+		File fileIn = getInputFile(kb);
+		File fileOut = getOutputFile(kb, fileIn);
 		String password = getPassword(kb);
 		//boolean wroteToFile = openOutputFile();
 		
 		System.out.println("Name: " + firstName + " " + lastName);
 		System.out.println("Integer 1: "  + val1 + "\nInteger 2: " + val2);
+      System.out.println("Integer 1 + Integer 2 = " + val1.add(val2));
+      System.out.println("Integer 1 x Integer 2 = " + val1.multiply(val2));
 		System.out.println("Password: " + password);
 		
 	}
@@ -75,17 +77,36 @@ public class defenseAssignment
 		kb.nextLine();
 		return val1;
 	}
-
-	private static File getOutputFile(Scanner kb) 
+   
+   private static File getInputFile(Scanner kb) 
 	{
-		// TODO Auto-generated method stub
-		return null;
+		System.out.println("Enter the Input filename: ");
+		
+		String val1 = null;
+		val1 = kb.nextLine();
+		while(!DataValidation.validateInputFilename(val1))
+		{
+			System.out.println("Please enter the Input filename: ");
+			val1 = kb.nextLine();
+		}		
+      
+		kb.nextLine();
+		return new File(val1);
 	}
-
-	private static File getInputFile(Scanner kb) 
+   
+	private static File getOutputFile(Scanner kb, File inputFile) 
 	{
-		// TODO Auto-generated method stub
-		return null;
+		System.out.println("Enter the Output filename: ");
+		
+		String val1 = null;
+		val1 = kb.nextLine();
+		while(!DataValidation.validateOutputFilename(val1, inputFile.toString()))
+		{
+			System.out.println("Please enter the Output filename: ");
+			val1 = kb.nextLine();
+		}		
+		kb.nextLine();
+		return new File(val1);
 	}
 
 	private static String getLastName(Scanner kb) 
