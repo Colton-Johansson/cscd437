@@ -1,3 +1,4 @@
+
 import java.io.*;
 import java.math.BigInteger;
 import java.util.regex.Pattern;
@@ -21,7 +22,7 @@ public class DataValidation
 	static boolean validatePassword(String input) 
 	{
 		Pattern pattern = null;
-		return printMessage(input,Pattern.matches("(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\\s)[0-9a-zA-Z!@#$%^&*();:'\",.<>\\-_=+\\\\|`~\\?]*$", input)); //Enter Password that is 10 or more characters long, contains AT LEAST 1 upper, AT LEAST one lower case, AT LEAST one number, and AT LEAST one punctuation
+		return printMessage(input,Pattern.matches("(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\\s)[0-9a-zA-Z!@#$%^&*();:'\",.<>\\-_=+\\\\|`~\\?]{10,}$", input)); //Enter Password that is 10 or more characters long, contains AT LEAST 1 upper, AT LEAST one lower case, AT LEAST one number, and AT LEAST one punctuation
 
 	}
 	
