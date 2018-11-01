@@ -29,7 +29,7 @@ public class DataValidation
    static boolean validateInputFilename(String input)
    {
       Pattern pattern = null;
-      if(pattern.matches("^[a-zA-Z0-9_]{1,50}.txt$",input))//regex is looking for a char sequence between 1 and 50, using capitals, lowercase, numbers, and/or _'s followed by '.txt'
+      if(pattern.matches("^[a-zA-Z0-9_]{1,50}\.txt$",input))//regex is looking for a char sequence between 1 and 50, using capitals, lowercase, numbers, and/or _'s followed by '.txt'
       {
          File inputFile = new File(input);
          
