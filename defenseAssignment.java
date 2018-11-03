@@ -1,3 +1,10 @@
+//Brandtly Strobeck, Colton Johansan, Joe Carlson
+//Secure Coding Fall, Tom Capaul
+//This program will attempt to be uncrashable from the command line using regex's, and other java implemented data screening methods
+//It will ask the user for various inputs such as strings, ints, and files.
+//NOTE: To set up the input file correctly, place it in the same folder as /src is so the program can find it. NOT IN /SRC, but the so they share a folder
+//For security purposes, we wanted to limit which files it has access to read, that is why it is set up this way.
+
 import java.io.*;
 import java.math.BigInteger;
 import java.util.Scanner;
@@ -9,20 +16,20 @@ public class defenseAssignment
 	{
 		Scanner kb = new Scanner(System.in);//might as well pass around the same scanner, remembering to flush the buffer when needed.
 
-		//String firstName = getFirstName(kb);
-		//String lastName = getLastName(kb);
-		//String val1 = getVal1(kb);
-		//String val2 = getVal2(kb);
-		//boolean fileIn = getInputFile(kb);
-		//File fileOut = getOutputFile(kb);
-		boolean savedPassword = setPassword(kb);// be sure to delete the reference in password ASAP after saving to file.
+		String firstName = getFirstName(kb);
+		String lastName = getLastName(kb);
+		BigInteger val1 = getVal1(kb);
+		BigInteger val2 = getVal2(kb);
+		File fileIn = getInputFile(kb);
+		File fileOut = getOutputFile(kb,fileIn);
+		boolean savedPassword = setPassword(kb);
 		boolean validPassword = checkPasswordHash(kb);
-		//boolean wroteToFile = openOutputFile();
+		openOutputFile(fileOut, firstName, lastName, val1, val2, fileIn);
 		
-		//System.out.println("Name: " + firstName + " " + lastName);
-		//System.out.println("Integer 1: "  + val1 + "\nInteger 2: " + val2);
+		System.out.println("Name: " + firstName + " " + lastName);
+		System.out.println("Integer 1: "  + val1 + "\nInteger 2: " + val2);
 		System.out.println("Password Saved? " + savedPassword);
-		//System.out.println(("Read input file? " + fileIn));
+		System.out.println(("Read input file? " + fileIn));
 		System.out.println("Valid Password? " + validPassword);
 		kb.close();//be sure to close off scanner when program is done.		
 	}
@@ -40,8 +47,7 @@ public class defenseAssignment
 			String fileSalt = "";
 			File file = new File("passwordFile.txt");
 			fScan = new Scanner(file);
-			
-			
+						
 			//doing it this way because Tom said user won't mess with open files while program is running. This way we can guarantee first line is hash and salt, second line is salt
 			if(fScan.hasNextLine())
 			{
@@ -56,9 +62,9 @@ public class defenseAssignment
 			
 			hashToCheck = passwordToCheck.hashCode() + fileSalt;//Concatenate new password with old salt
 			
-			System.out.println("hashToCheck: " + hashToCheck);
-			System.out.println("fileSalt:" + fileSalt);
-			System.out.println(passwordToCheck.hashCode());
+			System.out.println("Hash and Salt To Check: " + hashToCheck);
+			System.out.println("Salt stored in file:" + fileSalt);
+			System.out.println("Hash generated from retyped password: "+passwordToCheck.hashCode());
 			if(hashToCheck.equals(fileHashedPassword))
 			{
 				fScan.close();
@@ -73,60 +79,90 @@ public class defenseAssignment
 		}
 		catch(IOException e)
 		{
-			e.printStackTrace();
+			printError(e);
 			fScan.close();
 			return false;
 		}
 		
 	}
 
-	private static File getOutputFile(Scanner kb)
+	private static File getOutputFile(Scanner kb, File fileIn)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		System.out.println("Enter an output file name followed by .txt: ");
+		String fileName = "";
+		fileName = kb.nextLine();
+		while(!DataValidation.validateOutputFilename(fileName) || fileName.equals(fileIn.toString()))//to keep things from getting messy, we don't want the input and output files to be the ssame.
+		{
+			System.out.println("Enter a valid output file name followed by .txt. Input and Output files cannot be the same: ");
+			fileName = kb.nextLine();
+		}
+		System.out.println(fileName +" is valid. Press Enter.");
+		File file = new File(fileName);
+		try {
+			file.createNewFile();
+		} catch (IOException e) {
+			printError(e);
+		}
+		kb.nextLine();
+		return file;
 	}
 
-	private static boolean getInputFile(Scanner kb) 
+	private static File getInputFile(Scanner kb) 
 	{
 		System.out.println("Enter an input file name followed by .txt: ");
 		String fileName = "";
 		fileName = kb.nextLine();
-		Scanner fScan = null;//using a new scanner dedicated to reading the file.
-		
+				
 		while(!DataValidation.validateInputFilename(fileName))//keep looping till user enters a 'valid' input file.
 		{
 			System.out.println("Please enter a valid input file name followed by .txt: ");
 			fileName = kb.nextLine();
-		}		
+		}
+		File file = new File(fileName);
+		try {
+			file.createNewFile();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			printError(e);
+		}
+		kb.nextLine();
+		return file;
+	}
+
+	private static void openOutputFile(File fileOut, String firstName, String lastName, BigInteger val1, BigInteger val2, File fileIn) 
+	{
 		try
 		{
-			File file = new File(fileName);
-			fScan = new Scanner(file);
+			BigInteger sum = val1.add(val2);
+			BigInteger product = val1.multiply(val2);
+			Scanner fScan = new Scanner(fileIn);
+			FileOutputStream fos = new FileOutputStream(fileOut,false);//just keep appending to the file if they use the same one.
+			OutputStreamWriter osw = new OutputStreamWriter(fos,"ASCII");
+			BufferedWriter bw = new BufferedWriter(osw);
+			PrintWriter pw = new PrintWriter(bw,true);
+			pw.write(firstName + " " + lastName);
+			bw.newLine();
+			pw.write(sum.toString());
+			bw.newLine();
+			pw.write(product.toString());
+			bw.newLine();
+			pw.write("==Writing contents of input file==");
+			bw.newLine();
 			while(fScan.hasNextLine())
 			{
-				String line = fScan.nextLine();
-				System.out.println(line);				
+				pw.write(fScan.nextLine());
+				bw.newLine();
 			}
-			return true;
+			pw.close();
+			bw.close();
 		}
 		catch(IOException e)
 		{
-			e.printStackTrace();
-			return false;
+			printError(e);
 		}
-		
-		finally
-		{
-			fScan.close();//close off scanner when done.			
-		}
-	}
-
-	private static boolean openOutputFile() 
-	{
-		// TODO Auto-generated method stub
-		return false;
 	}
 	
+
 	private static boolean savePasswordToFile(String hash, String saltString)
 	{
 		try
@@ -134,7 +170,7 @@ public class defenseAssignment
 			File file = new File("passwordFile.txt");
 			file.createNewFile();//if file already exists it will do nothing.
 			FileOutputStream fos = new FileOutputStream(file,false);//don't append to file, but overwrite the last password saved when program is ran again is why the false is there.
-			OutputStreamWriter osw = new OutputStreamWriter(fos,"ASCII");// UTF-8 to specify the charset to be used, so we won't expect any weird chars
+			OutputStreamWriter osw = new OutputStreamWriter(fos,"ASCII");// ASCII to specify the charset to be used, so we won't expect any weird chars
 			BufferedWriter bw = new BufferedWriter(osw);
 			PrintWriter pw = new PrintWriter(bw,true);//true here is saying yes to autoFlush, which will flush the output buffer.
 			pw.write(hash);
@@ -147,7 +183,7 @@ public class defenseAssignment
 		}
 		catch(IOException e)
 		{
-			e.printStackTrace();
+			printError(e);
 			return false;
 		}
 	}
@@ -184,7 +220,7 @@ public class defenseAssignment
 		return wasWritten;
 	}
 		
-	private static String getVal2(Scanner kb) 
+	private static BigInteger getVal2(Scanner kb) 
 	{		
 		System.out.println("Enter another Integer: ");
 		
@@ -194,12 +230,13 @@ public class defenseAssignment
 		{
 			System.out.println("Please enter another Integer: ");
 			val2 = kb.nextLine();
-		}		
+		}
+		BigInteger val = new BigInteger(val2);
 		kb.nextLine();
-		return val2;
+		return val;
 	}
 
-	private static String getVal1(Scanner kb) 
+	private static BigInteger getVal1(Scanner kb) 
 	{		
 		System.out.println("Enter an Integer: ");
 		
@@ -209,9 +246,10 @@ public class defenseAssignment
 		{
 			System.out.println("Please enter an Integer: ");
 			val1 = kb.nextLine();
-		}		
-		kb.nextLine();
-		return val1;
+		}
+		BigInteger val = new BigInteger(val1);
+		kb.nextLine();		
+		return val;
 	}
 
 	private static String getLastName(Scanner kb) 
@@ -240,5 +278,26 @@ public class defenseAssignment
 		}		
 		kb.nextLine();
 		return returnName;
+	}
+	
+	private static void printError(IOException e)
+	{
+		try
+		{
+			File file = new File("errorLog.txt");
+			file.createNewFile();//if file already exists it will do nothing.
+			FileOutputStream fos = new FileOutputStream(file,true);//don't append to file, but overwrite the last password saved when program is ran again is why the false is there.
+			OutputStreamWriter osw = new OutputStreamWriter(fos,"ASCII");// ASCII to specify the charset to be used, so we won't expect any weird chars
+			BufferedWriter bw = new BufferedWriter(osw);
+			PrintWriter pw = new PrintWriter(bw,true);//true here is saying yes to autoFlush, which will flush the output buffer.
+			pw.write(e.toString());
+			bw.newLine();
+			pw.close();
+			bw.close();			
+		}
+		catch(IOException e1)
+		{
+			e.printStackTrace();//if it messes up writing to error log then we're really in for it
+		}
 	}
 }
