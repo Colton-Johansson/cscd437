@@ -176,7 +176,7 @@ public class defenseAssignment
 			pw.write(hash);
 			bw.newLine();
 			pw.write(saltString);
-			System.out.println("hash: " + hash + "\nSalt: " + saltString);
+			//System.out.println("hash: " + hash + "\nSalt: " + saltString);
 			pw.close();
 			bw.close();
 			return true;			
