@@ -24,6 +24,12 @@ public class defenseAssignment
 		File fileOut = getOutputFile(kb,fileIn);
 		boolean savedPassword = setPassword(kb);
 		boolean validPassword = checkPasswordHash(kb);
+      while(!validPassword)
+      {
+         System.out.println("Incorrect Password! Please try again.");
+         validPassword = checkPasswordHash(kb);
+      }
+      System.out.println("Correct Password! Thank you.");
 		openOutputFile(fileOut, firstName, lastName, val1, val2, fileIn);
 
 		kb.close();//be sure to close off scanner when program is done.		
@@ -47,12 +53,10 @@ public class defenseAssignment
 			if(fScan.hasNextLine())
 			{
 				fileHashedPassword = fScan.nextLine();
-				System.out.println(fileHashedPassword);
 			}
 			if(fScan.hasNextLine())
 			{
 				fileSalt = fScan.nextLine();
-				System.out.println(fileSalt);
 			}
 			
 			hashToCheck = passwordToCheck.hashCode() + fileSalt;//Concatenate new password with old salt
@@ -181,13 +185,13 @@ public class defenseAssignment
 
 	private static boolean setPassword(Scanner kb) 
 	{
-		System.out.println("Enter Password that is 10 or more characters long, contains AT LEAST 1 upper, AT LEAST one lower case, AT LEAST one number, and AT LEAST one punctuation: ");
+		System.out.println("Enter Password that is 10 or more characters long, contains AT LEAST 1 upper, AT LEAST one lower case, and AT LEAST one number: ");
 		
 		String password = "";
 		password = kb.nextLine();
 		while(!DataValidation.validatePassword(password))
 		{
-			System.out.println("Please enter a Password that is 10 or more characters long, contains AT LEAST 1 upper, AT LEAST one lower case, AT LEAST one number, and AT LEAST one punctuation: ");
+			System.out.println("Please enter a Password that is 10 or more characters long, contains AT LEAST 1 upper, AT LEAST one lower case, and AT LEAST one number,: ");
 			password = kb.nextLine();
 		}
 		//get plain text password
