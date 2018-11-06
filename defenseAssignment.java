@@ -25,12 +25,7 @@ public class defenseAssignment
 		boolean savedPassword = setPassword(kb);
 		boolean validPassword = checkPasswordHash(kb);
 		openOutputFile(fileOut, firstName, lastName, val1, val2, fileIn);
-		
-		System.out.println("Name: " + firstName + " " + lastName);
-		System.out.println("Integer 1: "  + val1 + "\nInteger 2: " + val2);
-		System.out.println("Password Saved? " + savedPassword);
-		System.out.println(("Read input file? " + fileIn));
-		System.out.println("Valid Password? " + validPassword);
+
 		kb.close();//be sure to close off scanner when program is done.		
 	}
 	
@@ -61,10 +56,6 @@ public class defenseAssignment
 			}
 			
 			hashToCheck = passwordToCheck.hashCode() + fileSalt;//Concatenate new password with old salt
-			
-			System.out.println("Hash and Salt To Check: " + hashToCheck);
-			System.out.println("Salt stored in file:" + fileSalt);
-			System.out.println("Hash generated from retyped password: "+passwordToCheck.hashCode());
 			if(hashToCheck.equals(fileHashedPassword))
 			{
 				fScan.close();
