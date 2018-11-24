@@ -10,6 +10,9 @@ import java.math.BigInteger;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 import java.security.SecureRandom;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.nio.charset.StandardCharsets;
 public class defenseAssignment
 {
 	public static void main(String[]args)
@@ -58,18 +61,26 @@ public class defenseAssignment
 			{
 				fileSalt = fScan.nextLine();
 			}
-			
-			hashToCheck = passwordToCheck.hashCode() + fileSalt;//Concatenate new password with old salt
-			if(hashToCheck.equals(fileHashedPassword))
-			{
-				fScan.close();
-				return true;
-			}					
-			else
-			{
-				fScan.close();
-				return false;
-			}
+			try
+         {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] encodedhash = digest.digest(passwordToCheck.getBytes(StandardCharsets.UTF_8));
+            hashToCheck = bytesToHex(encodedhash) + fileSalt;
+   			if(hashToCheck.equals(fileHashedPassword))
+   			{
+   				fScan.close();
+   				return true;
+   			}					
+   			else
+   			{
+   				fScan.close();
+   				return false;
+   			}
+         }
+         catch(NoSuchAlgorithmException e)
+         {
+            return false;
+         }
 				
 		}
 		catch(IOException e)
@@ -206,13 +217,23 @@ public class defenseAssignment
 			salt = salt*(-1);//help ensure our salt is positive.
 		}
 		String saltString = salt.toString();
-		String hash =password.hashCode() + saltString ;//get an acceptable password, then immedately send it through a hash function adding the salt to it, 
-		password = "";//and do our best to delete any reference to the plain text password for security's sake.
-		salt = null;		
-		boolean wasWritten = savePasswordToFile(hash,saltString); 
-		saltString = "";
-		kb.nextLine();
-		return wasWritten;
+      try
+      {
+         MessageDigest digest = MessageDigest.getInstance("SHA-256");
+         byte[] encodedhash = digest.digest(password.getBytes(StandardCharsets.UTF_8));
+         String hash = bytesToHex(encodedhash) + saltString;
+   		password = "";//and do our best to delete any reference to the plain text password for security's sake.
+   		salt = null;		
+   		boolean wasWritten = savePasswordToFile(hash,saltString); 
+   		saltString = "";
+   		kb.nextLine();
+   		return wasWritten;
+      }
+      catch(NoSuchAlgorithmException e)
+      {
+        return false;
+      }
+      
 	}
 		
 	private static BigInteger getVal2(Scanner kb) 
@@ -295,4 +316,15 @@ public class defenseAssignment
 			e.printStackTrace();//if it messes up writing to error log then we're really in for it
 		}
 	}
+   private static String bytesToHex(byte[] hash) 
+   {
+       StringBuffer hexString = new StringBuffer();
+       for (int i = 0; i < hash.length; i++) 
+       {
+          String hex = Integer.toHexString(0xff & hash[i]);
+          if(hex.length() == 1) hexString.append('0');
+          hexString.append(hex);
+       }
+       return hexString.toString();
+   } 
 }
